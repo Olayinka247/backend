@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Micheal",
+    "surname": "Oyor",
+    "id": 1,
+    "email": "mikeoy@aol.com",
+    "date of birth": " 12-12-1990",
+    "avatar": "https://ui-avatars.com/api/?name=John+Doe"
+  },
+  {
+    "name": "Lona",
+    "surname": "Okon",
+    "id": 2,
+    "email": "lonakon@ups.com",
+    "date of birth": " 12-12-1995",
+    "avatar": "https://ui-avatars.com/api/?name=John+Doe"
+  },
+  {
+    "name": "Donna",
+    "surname": "Madonna",
+    "id": 3,
+    "email": "domadona@sky.com",
+    "date of birth": " 12-12-1989",
+    "avatar": "https://ui-avatars.com/api/?name=John+Doe"
+  }
+]
