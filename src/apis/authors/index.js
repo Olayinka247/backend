@@ -33,13 +33,11 @@ const authorsJSONPath = join(
   dirname(fileURLToPath(import.meta.url)),
   "authors.json"
 );
-
-authorsRouter.post("/", (request, response) => {
-  // read request body
-  console.log("Request Body :", request.body);
+//  POST AUTHOR
+authorsRouter.post("/", (req, res) => {
+  console.log("Request Body :", req.body);
   // add server generated information
-  const newAuthor = { ...request.body, createdAt: new Date(), id: uniqid() };
-  console.log("NEW AUthor :", newAuthor);
+  const newAuthor = { ...req.body, createdAt: new Date(), id: uniqid() };
   // read user.json file
   const authors = JSON.parse(fs.readFileSync(authorsJSONPath));
   // push new user to the array
@@ -47,62 +45,56 @@ authorsRouter.post("/", (request, response) => {
   // write the array back to file
   fs.writeFileSync(authorsJSONPath, JSON.stringify(authors));
   //send a response
-  response.status(201).send({ id: newAuthor.id });
+  res.status(201).send(newAuthor);
 });
 
-// authorsRouter.get("/", (request, response) => {
-//   // Steps to follow
-//   //1.read the content in authors.json file
-//   const fileContent = fs.readFileSync(authorsJSONPath);
-//   console.log("File Details:", fileContent);
-//   //2.obtain an array from the file
-//   const authorsArray = JSON.parse(fileContent);
-//   console.log("Array information:", authorsArray);
-//   //3. send back the array as response
+// GET AUTHORS
+authorsRouter.get("/", (req, res) => {
+  const authorFIleContent = fs.readFileSync(authorsJSONPath);
+  const authorsArray = JSON.parse(authorFIleContent);
+  res.send(authorsArray);
+});
 
-//   response.send(authorsArray);
-// });
+// GET AUTHORS BY ID
 
-// authorsRouter.get("/:authorId", (request, response) => {
-//   // fetching by ID  STEPS
-//   //locate the authors ID from the url
-//   const authorID = request.params.authorId;
-//   console.log("Author ID :", authorID);
-//   // read the file obtain array
-//   const authors = JSON.parse(fs.readFileSync(authorsJSONPath));
-//   console.log("Read File :", authors);
-//   // use FIND to locate the author according to the authorsID
-//   const findAuthorID = authors.find((author) => author.id === authorID);
+authorsRouter.get("/:id", (req, res) => {
+  const authorID = req.params.id;
+  const authors = JSON.parse(fs.readFileSync(authorsJSONPath));
+  const findAuthor = authors.find((author) => author.id === authorID);
+  res.send(findAuthor);
+});
+authorsRouter.put("/:authorsId", (req, res) => {
+  // read the file to edit
+  const authorEdit = JSON.parse(fs.readFileSync(authorsJSONPath));
+  console.log("Autor Edit :", authorEdit);
+  // locate the details to edit using the ID
+  const locateIndex = authorEdit.findIndex(
+    (author) => author.id === req.params.authorsId
+  );
+  // connect all old authors with the edited and located authors
+  const oldAuthor = authorEdit[locateIndex];
 
-//   response.send(findAuthorID);
-// });
-// authorsRouter.put("/:authorsId", (request, response) => {
-//   // read the file to edit
-//   const authorEdit = JSON.parse(fs.readFileSync(authorsJSONPath));
-//   console.log("Autor Edit :", authorEdit);
-//   // locate the details to edit using the ID
-//   const locateIndex = authorEdit.findIndex(
-//     (author) => author.id === request.params.authorsId
-//   );
-//   // connect all old authors with the edited and located authors
-//   const oldAuthor = authorEdit[locateIndex];
+  //update the authors upon edit with ID
+  const updatedAuthors = {
+    ...oldAuthor,
+    ...req.body,
+    updatedAt: new Date(),
+  };
 
-//   //update the authors upon edit with ID
-//   const updatedAuthors = {
-//     ...oldAuthor,
-//     ...request.body,
-//     updatedAt: newDate(),
-//   };
+  authorEdit[locateIndex] = updatedAuthors;
+  // save the edited author array back to the file .
+  fs.writeFileSync(authorsJSONPath, JSON.stringify(authorEdit));
 
-//   authorEdit[locateIndex] = updatedAuthors;
-//   // save the edited author array back to the file .
-//   fs.writeFileSync(authorsJSONPath, JSON.stringify(authorEdit));
-
-//   // send a response
-//   response.send(updatedAuthors);
-// });
-// authorsRouter.delete("/:authorsId", (request, response) => {
-//   response.send({ message: "Deleted" });
-// });
+  // send a response
+  res.send(updatedAuthors);
+});
+authorsRouter.delete("/:authorId", (req, res) => {
+  const authors = JSON.parse(fs.readFileSync(authorsJSONPath));
+  const remainingAuthors = authors.filter(
+    (author) => author.id !== req.params.authorId
+  );
+  fs.writeFileSync(authorsJSONPath, JSON.stringify(remainingAuthors));
+  res.status(204).send;
+});
 
 export default authorsRouter;
